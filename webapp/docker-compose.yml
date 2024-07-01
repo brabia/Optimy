@@ -1,0 +1,55 @@
+# -----------------------------------------------------------------
+# dev.optimy.be
+# -----------------------------------------------------------------
+
+version: '3.1'
+
+services:
+    fpm:
+        build:
+            context: ./fpm
+        container_name: fpm
+        ports:
+            - 9000:9000
+        volumes:
+            # -----------------------------------------------------------------
+            # dev.optimy.be
+            # -----------------------------------------------------------------            
+            - ./dev.optimy.be/www:/var/www/html/dev.optimy.be
+        links:
+            - mysql
+    mysql:
+        build:
+            context: ./mysql
+        container_name: mysql
+        ports:
+            - 3310:3306
+        environment:
+            MYSQL_ROOT_HOST: "%"            
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: test_db
+            MYSQL_USER: test
+            MYSQL_PASSWORD: test_pass
+        volumes_from:
+            - data
+    data:
+        image: mysql:5.7
+        container_name: data
+        volumes:  
+            - /var/lib/mysql
+        command: "true"
+    
+    # -----------------------------------------------------------------
+    # dev.optimy.be
+    # -----------------------------------------------------------------    
+    dev.optimy.be:
+        build:
+            context: ./dev.optimy.be
+        container_name: dev.optimy.be
+        ports:
+            - 9280:80
+        volumes:
+            - ./dev.optimy.be/www:/var/www/html/dev.optimy.be
+            - ./dev.optimy.be/default.conf:/etc/nginx/conf.d/default.conf
+        depends_on:
+            - fpm

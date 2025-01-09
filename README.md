@@ -1,2 +1,2 @@
-# Optimy
+# Optimy.be
 Optimy
